@@ -5,11 +5,12 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
-
-
+import javax.swing.text.JTextComponent;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -100,7 +101,10 @@ public class insert extends JFrame {
 		
 		JButton btnNewButton = new JButton("SAVE");
 		btnNewButton.addActionListener(new ActionListener() {
+			private JTextComponent output;
+
 			public void actionPerformed(ActionEvent e) {
+				String ans;
 				try {
 					DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
 					Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","sujoy","hi_sujoy");
@@ -115,9 +119,14 @@ public class insert extends JFrame {
 					 String	s1=SEX1.getText();
 					 String	db1=DOB1.getText();
 					int update=statement.executeUpdate("insert into student_data values("+rr2+",'"+n1+"','"+d1+"','"+y1+"','"+s1+"','"+db1+"')");
-					System.out.println(update+" Row inserted");
+					ans=(update+" Row inserted");
+					JOptionPane.showMessageDialog(null,ans);
 				} catch (SQLException e1) {
-					e1.printStackTrace();
+					//e1.printStackTrace();
+					ans="Error!";
+					JTextArea output=new JTextArea(16,14);
+					output.setText(ans);
+					JOptionPane.showMessageDialog(null, ans," dialog box",JOptionPane.ERROR_MESSAGE );
 				}
 			}
 		});

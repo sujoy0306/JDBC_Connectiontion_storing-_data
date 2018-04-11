@@ -1,8 +1,14 @@
 package my_database;
-
+import java.sql.*;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
@@ -11,15 +17,41 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Vector;
 import java.awt.event.ActionEvent;
 
 public class show extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField DATA;
+	public static DefaultTableModel buildTableModel(ResultSet rs)
+	        throws SQLException {
 
+	    ResultSetMetaData metaData = rs.getMetaData();
+
+	    // names of columns
+	    Vector<String> columnNames = new Vector<String>();
+	    int columnCount = metaData.getColumnCount();
+	    for (int column = 1; column <= columnCount; column++) {
+	        columnNames.add(metaData.getColumnName(column));
+	    }
+
+	    // data of the table
+	    Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+	    while (rs.next()) {
+	        Vector<Object> vector = new Vector<Object>();
+	        for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+	            vector.add(rs.getObject(columnIndex));
+	        }
+	        data.add(vector);
+	    }
+
+	    return new DefaultTableModel(data, columnNames);
+
+	}
 	
 	public show() {
 		setTitle("DISPLAY");
@@ -56,26 +88,33 @@ public class show extends JFrame {
 					 String res="SELECT * FROM student_data WHERE " +column+"="+"'"+text+"'";
 			//		 System.out.println(res);
 					 ResultSet rs=statement.executeQuery(res);;
-					 while(rs.next()) {
-						 int r1  = rs.getInt("roll");
-				         String  n1= rs.getString("name");
-				         String d1 = rs.getString("dept_id");
-				         String y1 = rs.getString("year");
-				         String s1 = rs.getString("sex");
-				         String db1 = rs.getString("dob");
-				         System.out.println(r1+" "+n1+" "+d1+" "+y1+" "+s1+" "+db1);
-				        // System.out.println("CRAZY");
-					 }
-					 rs.close();
-					//System.out.println(update+" Row deleted");
-				} catch (SQLException e1) {
+					 new table(rs);
+					} catch (SQLException e1) {
 					e1.printStackTrace();
 				}
 			}
 		});
 		btnNewButton.setBounds(164, 110, 110, 25);
 		contentPane.add(btnNewButton);
+		
+		JButton show_all = new JButton("SHOW ALL");
+		show_all.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+					Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","sujoy","hi_sujoy");
+					Statement statement = connection.createStatement();
+					 String res="SELECT * FROM student_data";
+			//		 System.out.println(res);
+					 ResultSet rs=statement.executeQuery(res);;
+					 new table(rs);
+					} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		show_all.setBounds(164, 163, 110, 25);
+		contentPane.add(show_all);
 		setVisible(true);
 	}
-
 }

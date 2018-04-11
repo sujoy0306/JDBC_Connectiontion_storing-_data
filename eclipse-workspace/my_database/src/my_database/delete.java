@@ -4,7 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
@@ -43,6 +45,7 @@ public class delete extends JFrame {
 		JButton btnDelete = new JButton("DELETE");
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String ans;
 				try {
 					DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
 					Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","sujoy","hi_sujoy");
@@ -54,9 +57,14 @@ public class delete extends JFrame {
 					 String res="DELETE FROM student_data WHERE " +column+"="+"'"+text+"'";
 				//	 System.out.println(res);
 					int update=statement.executeUpdate(res);
-					System.out.println(update+" Row deleted");
+					ans=(update+" Row deleted");
+					JOptionPane.showMessageDialog(null,ans);
 				} catch (SQLException e1) {
-					e1.printStackTrace();
+					//e1.printStackTrace();
+					ans="Error  Exists!";
+					JTextArea output=new JTextArea(16,14);
+					output.setText(ans);
+					JOptionPane.showMessageDialog(null, ans," dialog box",JOptionPane.ERROR_MESSAGE );
 				}
 			}
 		});
